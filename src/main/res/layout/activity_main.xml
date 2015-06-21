@@ -22,7 +22,9 @@
             android:id="@+id/imageButton"
             android:layout_gravity="center_horizontal"
             android:background="@drawable/firefox"
-            android:contentDescription="@string/BUTTON_FOX" />
+            android:contentDescription="@string/BUTTON_FOX"
+            android:onClick="gotoNewGame"
+            />
 
 
 
