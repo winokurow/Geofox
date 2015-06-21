@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="30dp">
+        </View>
+
+        <ImageButton
+            android:layout_width="201dp"
+            android:layout_height="150dp"
+            android:id="@+id/imageButton"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/firefox"
+            android:contentDescription="@string/BUTTON_FOX" />
+
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="30dp">
+        </View>
+
+        <ImageButton
+            android:layout_width="201dp"
+            android:layout_height="150dp"
+            android:id="@+id/imageButton1"
+            android:layout_gravity="center_horizontal"
+            android:background="#ffffffff"
+            android:src="@drawable/aim"
+            android:contentDescription="@string/BUTTON_HUNTER" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="30dp">
+        </View>
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/BUTTON_HELP"
+            android:id="@+id/button3"
+            android:layout_gravity="right" />
+    </LinearLayout>
+
+</RelativeLayout>

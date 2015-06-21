@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Geo hunt</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="BUTTON_FOX">Fox</string>
+    <string name="BUTTON_HUNTER">Hunter</string>
+    <string name="BUTTON_HELP">\?</string>
+</resources>
