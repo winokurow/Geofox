@@ -22,7 +22,7 @@
             android:id="@+id/imageButton"
             android:layout_gravity="center_horizontal"
             android:background="@drawable/firefox"
-            android:contentDescription="@string/BUTTON_FOX"
+            android:contentDescription="@string/main_creategameButton"
             android:onClick="gotoNewGame"
             />
 
@@ -40,7 +40,7 @@
             android:layout_gravity="center_horizontal"
             android:background="#ffffffff"
             android:src="@drawable/aim"
-            android:contentDescription="@string/BUTTON_HUNTER" />
+            android:contentDescription="@string/main_joingameButton" />
 
         <View
             android:layout_width="fill_parent"
@@ -51,7 +51,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/BUTTON_HELP"
+            android:text="@string/main_helpButton"
             android:id="@+id/button3"
             android:layout_gravity="right" />
     </LinearLayout>

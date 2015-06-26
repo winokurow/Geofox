@@ -39,11 +39,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     / Open Activity 'New Game' after click on the button 'Fox'.
+     / Open Activity 'New Game' after click on the button 'Fox'
      /
      */
     public void gotoNewGame(View view) {
         Intent intent = new Intent(this, NewGameActivity.class);
         startActivity(intent);
+
+
     }
 }
