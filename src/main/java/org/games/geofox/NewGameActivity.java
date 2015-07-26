@@ -125,6 +125,7 @@ public class NewGameActivity extends ActionBarActivity {
             passwordEditText.setEnabled(false);
             usernameEditText.setEnabled(false);
             post("1", gamename, password, username);
+
             findViewById(R.id.okButton).setEnabled(false);
             findViewById(R.id.cancelButton).setEnabled(false);
         }
@@ -133,6 +134,14 @@ public class NewGameActivity extends ActionBarActivity {
 
     }
 
+    /**
+     * post - Send create new game request
+     *
+     * @param typ - game type (now it is always 1)
+     * @param name - game name
+     * @param password - game password
+     * @param username - fox username
+     */
     public void post(String typ, String name,  String password, String username){
         String result = "";
 
@@ -173,26 +182,34 @@ public class NewGameActivity extends ActionBarActivity {
                                 findViewById(R.id.username).setEnabled(true);
                                 findViewById(R.id.okButton).setEnabled(true);
                                 findViewById(R.id.cancelButton).setEnabled(true);
+                                Intent intent = new Intent(context, MapsActivity.class);
+                                startActivity(intent);
                             }
                 }, new Response.ErrorListener() {
 
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                if (error.networkResponse.headers.get("error")==null)
-                                {
-                                    Toast toast = Toast.makeText(getApplicationContext(), "Unexpected error. Please contact the game support.", Toast.LENGTH_LONG);
-                                    toast.show();
+                                if (error.networkResponse  != null) {
+                                    if (error.networkResponse.headers.get("error") == null) {
+                                        Toast toast = Toast.makeText(getApplicationContext(), "Unexpected error. Please contact the game support.", Toast.LENGTH_LONG);
+                                        toast.show();
+                                    } else {
+                                        Toast toast = Toast.makeText(getApplicationContext(), error.networkResponse.headers.get("error"), Toast.LENGTH_LONG);
+                                        toast.show();
+                                    }
+                                    Log.d("abd", "Error: " + error
+                                            + ">>" + error.networkResponse.statusCode
+                                            + ">>" + error.networkResponse.data
+                                            + ">>" + error.getCause()
+                                            + ">>" + error.getMessage());
                                 } else {
-                                    Toast toast = Toast.makeText(getApplicationContext(), error.networkResponse.headers.get("error"), Toast.LENGTH_LONG);
+                                    Toast toast = Toast.makeText(getApplicationContext(), "Unexpected error. Conection Timeout. Please contact the game support.", Toast.LENGTH_LONG);
                                     toast.show();
+                                    Log.d("abd", "Unexpected error. Conection Timeout. ");
+
                                 }
 
 
-                                Log.d("abd", "Error: " + error
-                                        + ">>" + error.networkResponse.statusCode
-                                        + ">>" + error.networkResponse.data
-                                        + ">>" + error.getCause()
-                                        + ">>" + error.getMessage());
                                 findViewById(R.id.typ).setEnabled(true);
                                 findViewById(R.id.gameName).setEnabled(true);
                                 findViewById(R.id.gamePassword).setEnabled(true);

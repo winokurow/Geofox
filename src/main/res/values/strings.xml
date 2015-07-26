@@ -15,5 +15,6 @@
     <string-array name="gameTyp">
         <item>Alien Hunt</item>
     </string-array>
+    <string name="title_activity_maps">Map</string>
 
 </resources>
