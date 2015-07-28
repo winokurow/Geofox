@@ -18,15 +18,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends FragmentActivity  implements LocationListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private Context context;
     private LocationManager locationManager;
     private String bestProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_maps);
-        this.context = this;
+        Context context = this;
         mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(
                 R.id.map)).getMap();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

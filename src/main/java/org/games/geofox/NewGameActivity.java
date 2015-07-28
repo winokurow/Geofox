@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Properties;
 
 
-public class NewGameActivity extends ActionBarActivity {
+public class NewGameActivity extends AppCompatActivity {
 
     private Context context;
     private String version;
@@ -57,10 +57,6 @@ public class NewGameActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -142,8 +138,7 @@ public class NewGameActivity extends ActionBarActivity {
      * @param password - game password
      * @param username - fox username
      */
-    public void post(String typ, String name,  String password, String username){
-        String result = "";
+    private void post(String typ, String name,  String password, String username){
 
         Properties prop = new Properties();
         AssetManager assetManager = getAssets();
@@ -199,7 +194,6 @@ public class NewGameActivity extends ActionBarActivity {
                                     }
                                     Log.d("abd", "Error: " + error
                                             + ">>" + error.networkResponse.statusCode
-                                            + ">>" + error.networkResponse.data
                                             + ">>" + error.getCause()
                                             + ">>" + error.getMessage());
                                 } else {
@@ -224,7 +218,7 @@ public class NewGameActivity extends ActionBarActivity {
                 ){
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String,String> params = new HashMap<String, String>();
+                    Map<String,String> params = new HashMap<>();
                     params.put("version", version);
                     return params;
                 }};

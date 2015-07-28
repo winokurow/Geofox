@@ -9,73 +9,92 @@
     tools:context="org.games.geofox.NewGameActivity"
     android:background="#fff3f3f3">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:background="#ffffffff">
+
     <Spinner
         android:id="@+id/typ"
         android:layout_width="fill_parent"
         android:layout_height="67dp"
-        android:gravity="end|right"
+        android:gravity="end"
         android:entries="@array/gameTyp"
+        android:background="@drawable/edittextstyle"
         />
 
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="15dp" >
+        </View>
     <EditText
         android:id="@+id/gameName"
         android:layout_width="match_parent"
         android:layout_height="67dp"
-        android:gravity="end|center_vertical"
         android:hint="@string/newgame_nameEditText"
         android:imeOptions="actionNext"
-        android:singleLine="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/typ"
+        android:background="@drawable/edittextstyle"
         />
 
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="15dp" >
+        </View>
     <EditText
         android:id="@+id/gamePassword"
         android:layout_width="match_parent"
         android:layout_height="67dp"
-        android:gravity="end|center_vertical"
         android:hint="@string/newgame_passwordEditText"
         android:imeOptions="actionNext"
-        android:singleLine="true"
-        android:layout_below="@+id/gameName"
-     />
+        android:inputType="textPassword"
+        android:background="@drawable/edittextstyle"
+        />
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="15dp" >
+        </View>
 
     <EditText
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="67dp"
-        android:gravity="end|center_vertical"
         android:hint="@string/newgame_usernameEditText"
         android:imeOptions="actionNext"
-        android:singleLine="true"
-        android:layout_below="@+id/gamePassword" />
+        android:background="@drawable/edittextstyle"
+        />
+
 <RelativeLayout
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="128dp"
     android:layout_below="@+id/username"
     android:baselineAligned="false">
 
     <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:text="@string/newgame_okButtonText"
-        android:id="@+id/okButton"
-        android:layout_gravity="end"
-        android:onClick="doStartGame"
-        android:layout_toLeftOf="@+id/cancelButton" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
         android:text="@string/newgame_cancelButtonText"
         android:id="@+id/cancelButton"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="end"
-        android:onClick="gotoMainActivity" />
-</RelativeLayout>
+        android:onClick="gotoMainActivity"
+        style ="@style/buttonsmall"
 
+        android:layout_alignParentRight="true"
+         />
+    <Button
+        android:text="@string/newgame_okButtonText"
+        android:id="@+id/okButton"
+        android:onClick="doStartGame"
+        style ="@style/buttonsmall"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/cancelButton"
+
+         />
+
+
+
+</RelativeLayout>
+    </LinearLayout>
 </RelativeLayout>

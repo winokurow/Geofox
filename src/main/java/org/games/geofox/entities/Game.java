@@ -1,8 +1,9 @@
-package org.games.geofox.entities;
-
 /**
  * Created by Ilja.Winokurow on 26.06.2015.
  */
+package org.games.geofox.entities;
+
+
 public class Game {
 
 
