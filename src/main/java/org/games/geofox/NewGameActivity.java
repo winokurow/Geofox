@@ -6,7 +6,6 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -49,17 +48,6 @@ public class NewGameActivity extends AppCompatActivity {
 //        getMenuInflater().inflate(R.menu.menu_new_game, menu);
 //        return true;
 //    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-
-        return super.onOptionsItemSelected(item);
-    }
 
     /**
      / Open Activity 'New Game' after click on the button 'Fox'.

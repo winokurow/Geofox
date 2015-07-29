@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="buttonsmall" parent="generalbutton">
+        <item name="android:textSize">@dimen/abc_text_size_body_2_material</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_width">75dp</item>
+    </style>
+
+    <style name="buttonbig" parent="generalbutton">
+        <item name="android:textSize">@dimen/abc_text_size_display_1_material</item>
+        <item name="android:layout_height">100dp</item>
+        <item name="android:layout_width">215dp</item>
+    </style>
+
+    <style name="generalbutton" parent="android:style/Widget.Button">
+        <item name="android:background">#ffffd41e</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:capitalize">words</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_marginTop">15dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+    </style>
+
+</resources>

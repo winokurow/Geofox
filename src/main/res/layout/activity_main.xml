@@ -44,6 +44,7 @@
             android:layout_gravity="center_horizontal"
             android:background="#ffffd41e"
             android:text="@string/main_joingameButton"
+            android:onClick="gotoJoinGame"
             android:textColor="@android:color/white"
             android:textSize="@dimen/abc_text_size_display_1_material"
             android:capitalize="words"

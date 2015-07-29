@@ -16,7 +16,7 @@
         <item>Alien Hunt</item>
     </string-array>
     <string name="title_activity_maps">Map</string>
-    <string name="title_activity_activity_join_game">activity_join_game</string>
+    <string name="title_activity_join_game">Join a game</string>
 
     <string name="hello_world">Hello world!</string>
 

@@ -49,8 +49,8 @@
             android:label="@string/title_activity_maps" >
         </activity>
         <activity
-            android:name=".activity_join_game"
-            android:label="@string/title_activity_activity_join_game" >
+            android:name=".JoinGameActivity"
+            android:label="@string/title_activity_join_game" >
         </activity>
     </application>
 

@@ -1,0 +1,92 @@
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context="org.games.geofox.JoinGameActivity"
+        android:background="#fff3f3f3">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:background="#ffffffff">
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" >
+            </View>
+            <EditText
+                android:id="@+id/gameName"
+                android:layout_width="match_parent"
+                android:layout_height="67dp"
+                android:hint="@string/newgame_nameEditText"
+                android:imeOptions="actionNext"
+                android:background="@drawable/edittextstyle"
+                />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" >
+            </View>
+            <EditText
+                android:id="@+id/gamePassword"
+                android:layout_width="match_parent"
+                android:layout_height="67dp"
+                android:hint="@string/newgame_passwordEditText"
+                android:imeOptions="actionNext"
+                android:inputType="textPassword"
+                android:background="@drawable/edittextstyle"
+                />
+
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" >
+            </View>
+
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="67dp"
+                android:hint="@string/newgame_usernameEditText"
+                android:imeOptions="actionNext"
+                android:background="@drawable/edittextstyle"
+                />
+
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="128dp"
+                android:layout_below="@+id/username"
+                android:baselineAligned="false">
+
+                <Button
+                    android:text="@string/newgame_cancelButtonText"
+                    android:id="@+id/cancelButton"
+                    android:onClick="gotoMainActivity"
+                    style ="@style/buttonsmall"
+
+                    android:layout_alignParentRight="true"
+                    />
+                <Button
+                    android:text="@string/newgame_okButtonText"
+                    android:id="@+id/okButton"
+                    android:onClick="doStartGame"
+                    style ="@style/buttonsmall"
+                    android:layout_alignParentTop="true"
+                    android:layout_toLeftOf="@+id/cancelButton"
+
+                    />
+
+
+
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
+

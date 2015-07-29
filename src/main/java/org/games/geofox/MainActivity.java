@@ -41,7 +41,14 @@ public class MainActivity extends AppCompatActivity {
     public void gotoNewGame(View view) {
         Intent intent = new Intent(this, NewGameActivity.class);
         startActivity(intent);
+    }
 
-
+    /**
+     / Open Activity 'New Game' after click on the button 'Fox'
+     /
+     */
+    public void gotoJoinGame(View view) {
+        Intent intent = new Intent(this, JoinGameActivity.class);
+        startActivity(intent);
     }
 }
