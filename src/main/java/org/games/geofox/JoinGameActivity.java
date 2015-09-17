@@ -1,9 +1,12 @@
 package org.games.geofox;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -20,6 +23,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.games.geofox.common.CommonUtils;
+import org.games.geofox.geofox.service.ServiceGPS;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,10 +38,15 @@ public class JoinGameActivity extends ActionBarActivity {
 
     private Context context;
     private String version;
+    private String url;
+
+    private ServiceGPS myService;
+    private boolean bound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.context = this;
         setContentView(R.layout.activity_join_game);
     }
 
@@ -66,7 +75,7 @@ public class JoinGameActivity extends ActionBarActivity {
      / Start new game.
      /
      */
-    public void doStartGame(View view) {
+    public void doJoinGame(View view) {
         boolean isError = false;
         EditText gamenameEditText = (EditText) findViewById(R.id.gameName);
         String gamename = gamenameEditText.getText().toString().trim();
@@ -111,7 +120,7 @@ public class JoinGameActivity extends ActionBarActivity {
             gamenameEditText.setEnabled(false);
             passwordEditText.setEnabled(false);
             usernameEditText.setEnabled(false);
-            post("1", gamename, password, username);
+            post("0", gamename, password, username);
 
             findViewById(R.id.okButton).setEnabled(false);
             findViewById(R.id.cancelButton).setEnabled(false);
@@ -140,7 +149,7 @@ public class JoinGameActivity extends ActionBarActivity {
         } catch (IOException e) {
             Log.d("abd", "Error: " + e.getMessage());
         }
-        String url = prop.getProperty("service.url");
+        url = prop.getProperty("service.url");
         version = prop.getProperty("service.version");
 
         JSONObject obj = new JSONObject();
@@ -167,6 +176,16 @@ public class JoinGameActivity extends ActionBarActivity {
                 findViewById(R.id.username).setEnabled(true);
                 findViewById(R.id.okButton).setEnabled(true);
                 findViewById(R.id.cancelButton).setEnabled(true);
+
+                Intent intent1 = new Intent(context, ServiceGPS.class);
+                try {
+                    intent1.putExtra("sessionid", response.getString("gameid"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                intent1.putExtra("version", version);
+                intent1.putExtra("url", url);
+                startService(intent1);
                 Intent intent = new Intent(context, MapsActivity.class);
                 startActivity(intent);
             }
@@ -179,8 +198,30 @@ public class JoinGameActivity extends ActionBarActivity {
                         Toast toast = Toast.makeText(getApplicationContext(), "Unexpected error. Please contact the game support.", Toast.LENGTH_LONG);
                         toast.show();
                     } else {
-                        Toast toast = Toast.makeText(getApplicationContext(), error.networkResponse.headers.get("error"), Toast.LENGTH_LONG);
-                        toast.show();
+                        String errorString = error.networkResponse.headers.get("error");
+                        int id = getResources().getIdentifier(errorString, "string", getPackageName());
+                        String value = id == 0 ? "" : (String) getResources().getText(id);
+
+
+                        EditText gamenameEditText = (EditText) findViewById(R.id.gameName);
+                        EditText usernameEditText = (EditText) findViewById(R.id.username);
+                        EditText passwordEditText = (EditText) findViewById(R.id.gamePassword);
+                        switch (errorString) {
+                            case "ERROR_ERR1":
+                                usernameEditText.setError(value);
+                                break;
+                            case "ERROR_ERR2":
+                                gamenameEditText.setError(value);
+                                break;
+                            case "ERROR_ERR3":
+                                gamenameEditText.setError(value);
+                                passwordEditText.setError(value);
+                                break;
+                            default:
+                                Toast toast = Toast.makeText(getApplicationContext(),value, Toast.LENGTH_LONG);
+                                toast.show();
+                        }
+
                     }
                     Log.d("abd", "Error: " + error
                             + ">>" + error.networkResponse.statusCode
@@ -212,6 +253,26 @@ public class JoinGameActivity extends ActionBarActivity {
             }};
         queue.add(jsObjRequest);
 
+    }
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+
+        public void onServiceConnected( ComponentName className, IBinder service ) {
+
+            myService = ( (ServiceGPS.ServiceBinder) service ).getService();
+            bound = true;
+        }
+
+        public void onServiceDisconnected( ComponentName className ) {
+
+            myService = null;
+            bound = false;
+        }
+    };
+
+    void doBindService() {
+
+        bindService( new Intent( this, ServiceGPS.class ), serviceConnection, Context.BIND_AUTO_CREATE );
     }
 
 }

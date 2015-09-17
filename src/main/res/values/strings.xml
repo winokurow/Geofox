@@ -18,6 +18,10 @@
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_join_game">Join a game</string>
 
-    <string name="hello_world">Hello world!</string>
+
+    <string name="ERROR_ERR0">ERROR: Something goes wrong.</string>
+    <string name="ERROR_ERR1">ERROR: The user with this name is already in game.</string>
+    <string name="ERROR_ERR2">ERROR: The game with this name is already exists.</string>
+    <string name="ERROR_ERR3">ERROR: The game name or password is incorrect.</string>
 
 </resources>

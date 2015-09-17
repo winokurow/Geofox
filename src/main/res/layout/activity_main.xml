@@ -30,7 +30,8 @@
             android:capitalize="words"
             android:textAllCaps="false"
             style ="@style/buttonbig"
-            />
+            android:clickable="false"
+            android:elegantTextHeight="false" />
 
 
 

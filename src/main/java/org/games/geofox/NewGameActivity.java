@@ -19,6 +19,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.games.geofox.common.CommonUtils;
+import org.games.geofox.geofox.service.ServiceGPS;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,6 +34,7 @@ public class NewGameActivity extends AppCompatActivity {
 
     private Context context;
     private String version;
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +107,10 @@ public class NewGameActivity extends AppCompatActivity {
         if (!(isError))
         {
             findViewById(R.id.typ).setEnabled(false);
+            gamenameEditText.setError(null);
+            usernameEditText.setError(null);
+            passwordEditText.setError(null);
+
             gamenameEditText.setEnabled(false);
             passwordEditText.setEnabled(false);
             usernameEditText.setEnabled(false);
@@ -137,7 +143,7 @@ public class NewGameActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.d("abd", "Error: " + e.getMessage());
         }
-            String url = prop.getProperty("service.url");
+            url = prop.getProperty("service.url");
             version = prop.getProperty("service.version");
 
             JSONObject obj = new JSONObject();
@@ -165,6 +171,16 @@ public class NewGameActivity extends AppCompatActivity {
                                 findViewById(R.id.username).setEnabled(true);
                                 findViewById(R.id.okButton).setEnabled(true);
                                 findViewById(R.id.cancelButton).setEnabled(true);
+
+                                Intent intent1 = new Intent(context, ServiceGPS.class);
+                                try {
+                                    intent1.putExtra("sessionid", response.getString("gameid"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                intent1.putExtra("version", version);
+                                intent1.putExtra("url", url);
+                                startService(intent1);
                                 Intent intent = new Intent(context, MapsActivity.class);
                                 startActivity(intent);
                             }
@@ -177,8 +193,29 @@ public class NewGameActivity extends AppCompatActivity {
                                         Toast toast = Toast.makeText(getApplicationContext(), "Unexpected error. Please contact the game support.", Toast.LENGTH_LONG);
                                         toast.show();
                                     } else {
-                                        Toast toast = Toast.makeText(getApplicationContext(), error.networkResponse.headers.get("error"), Toast.LENGTH_LONG);
-                                        toast.show();
+                                        String errorString = error.networkResponse.headers.get("error");
+                                        int id = getResources().getIdentifier(errorString, "string", getPackageName());
+                                        String value = id == 0 ? "" : (String) getResources().getText(id);
+
+
+                                        EditText gamenameEditText = (EditText) findViewById(R.id.gameName);
+                                        EditText usernameEditText = (EditText) findViewById(R.id.username);
+                                        EditText passwordEditText = (EditText) findViewById(R.id.gamePassword);
+                                        switch (errorString) {
+                                            case "ERROR_ERR1":
+                                                usernameEditText.setError(value);
+                                                break;
+                                            case "ERROR_ERR2":
+                                                gamenameEditText.setError(value);
+                                                break;
+                                            case "ERROR_ERR3":
+                                                gamenameEditText.setError(value);
+                                                passwordEditText.setError(value);
+                                                break;
+                                            default:
+                                                Toast toast = Toast.makeText(getApplicationContext(),value, Toast.LENGTH_LONG);
+                                                toast.show();
+                                        }
                                     }
                                     Log.d("abd", "Error: " + error
                                             + ">>" + error.networkResponse.statusCode
