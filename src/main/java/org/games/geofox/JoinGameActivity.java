@@ -187,6 +187,7 @@ public class JoinGameActivity extends ActionBarActivity {
                 intent1.putExtra("url", url);
                 startService(intent1);
                 Intent intent = new Intent(context, MapsActivity.class);
+                intent.putExtra("typ", 1);
                 startActivity(intent);
             }
         }, new Response.ErrorListener() {

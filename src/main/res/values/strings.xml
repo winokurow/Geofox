@@ -23,5 +23,11 @@
     <string name="ERROR_ERR1">ERROR: The user with this name is already in game.</string>
     <string name="ERROR_ERR2">ERROR: The game with this name is already exists.</string>
     <string name="ERROR_ERR3">ERROR: The game name or password is incorrect.</string>
+    <string name="title_activity_end">EndActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

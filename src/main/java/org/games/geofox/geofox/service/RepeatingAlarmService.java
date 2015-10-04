@@ -16,7 +16,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 
+import org.games.geofox.MapsActivity;
+import org.games.geofox.entities.GameStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,9 +35,13 @@ public class RepeatingAlarmService extends BroadcastReceiver {
 
     public String sessionid;
     public String version;
+    GameStatus retr;
+    String test;
+    Context context;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context1, Intent intent) {
+        context = context1;
         sessionid = intent.getExtras().getString("sessionid");
         String url = intent.getExtras().getString("url");
         version = intent.getExtras().getString("version");
@@ -41,11 +50,18 @@ public class RepeatingAlarmService extends BroadcastReceiver {
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, false);
         Location location = locationManager.getLastKnownLocation(bestProvider);
-        double lat = location.getLatitude();
-        double lon = location.getLongitude();
-        double speed = location.getSpeed();
-        double accuracy = location.getAccuracy();
-        double alt = location.getAltitude();
+        double lat = 0.00;
+        double lon = 0.00;
+        double speed = 0.00;
+        double accuracy = 0.00;
+        double alt = 0.00;
+        if (location != null) {
+             lat = location.getLatitude();
+             lon = location.getLongitude();
+             speed = location.getSpeed();
+             accuracy = location.getAccuracy();
+             alt = location.getAltitude();
+        }
 /*        try {
             lat = location.getLatitude();
             lon = location.getLongitude();
@@ -54,38 +70,55 @@ public class RepeatingAlarmService extends BroadcastReceiver {
             lon = -1.0;
         }*/
 
-        Log.d("abd", "Session Id." + sessionid);
+        Log.e("abd", "Session Id." + sessionid);
         Toast.makeText(context, "It's Service Time!" + sessionid, Toast.LENGTH_LONG).show();
         JSONObject obj = new JSONObject();
         JSONObject obj1 = new JSONObject();
         try {
-            obj.put("coordx", lat);
-            obj.put("coordy", lon);
+            obj.put("latitude", lat);
+            obj.put("longitude", lon);
             obj.put("altitude",alt);
             obj.put("accuracy", accuracy);
             obj.put("speed", speed);
             obj1.put("position",obj );
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("DEBUG123", e.getMessage());
         }
         RequestQueue queue = Volley.newRequestQueue(context);
+        Log.e("abd", "URL." + url);
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, url, obj1, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
-
+                ObjectMapper mapper = new ObjectMapper();
+                AnnotationIntrospector introspector = new
+                        JacksonAnnotationIntrospector();
+                mapper.setAnnotationIntrospector(introspector);
+                try {
+                    retr = mapper.readValue(response.toString(), GameStatus.class);
+                    test = retr.toString();
+                    if (retr != null) {
+                        Intent intent1 = new Intent(MapsActivity.BROADCAST_ACTION);
+                        intent1.putExtra("gamestatus", retr);
+                        Log.e("DEBUG123", "6");
+                        try {
+                            context.sendBroadcast(intent1);
+                        } catch (Exception e) {
+                            Log.e("DEBUG123", e.getMessage());
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e("DEBUG123", e.getMessage());
+                }
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                    Log.e("abd", "Service error");
+                Log.e("DEBUG123", error.getMessage());
             }
-
-
         }
-
         ){
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -96,6 +129,6 @@ public class RepeatingAlarmService extends BroadcastReceiver {
             }};
 
         queue.add(jsObjRequest);
-        Log.v(this.getClass().getName(), "Timed alarm onReceive() started at time: " + new java.sql.Timestamp(System.currentTimeMillis()).toString());
+
     }
 }

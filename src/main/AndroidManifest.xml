@@ -12,7 +12,7 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -54,15 +54,26 @@
             android:label="@string/title_activity_join_game" >
         </activity>
 
-        <receiver android:name=".geofox.service.RepeatingAlarmService" android:process=":remote"/>
-
-        <receiver android:name=".geofox.service.OnBootReceiver" android:enabled="true" android:exported="false">
+        <receiver
+            android:name=".geofox.service.RepeatingAlarmService"
+            android:process=":remote" />
+        <receiver
+            android:name=".geofox.service.OnBootReceiver"
+            android:enabled="true"
+            android:exported="false" >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <service android:enabled="true" android:name=".geofox.service.ServiceGPS"/>
+        <service
+            android:name=".geofox.service.ServiceGPS"
+            android:enabled="true" />
+
+        <activity
+            android:name=".EndActivity"
+            android:label="@string/title_activity_end" >
+        </activity>
     </application>
 
 </manifest>
