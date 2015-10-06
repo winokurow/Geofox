@@ -116,7 +116,7 @@ public class RepeatingAlarmService extends BroadcastReceiver {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("DEBUG123", error.getMessage());
+                Log.e("DEBUG123","Error");
             }
         }
         ){

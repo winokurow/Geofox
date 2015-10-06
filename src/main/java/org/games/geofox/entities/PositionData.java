@@ -9,6 +9,20 @@ import java.io.Serializable;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PositionData  implements Serializable {
+
+
+    public PositionData(String name, double latitude, double longitude) {
+        this.name = name;
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
+
+    /**
+     * Name.
+     */
+
+    private String name;
+
     /**
      * Longitude.
      */
@@ -33,6 +47,20 @@ public class PositionData  implements Serializable {
      * Speed.
      */
     private double speed;
+
+    //Introducing the dummy constructor
+    public PositionData() {
+    }
+
+
+    public PositionData(String name, double longitude, double latitude, double accuracy, double altitude, double speed) {
+        this.name = name;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.accuracy = accuracy;
+        this.altitude = altitude;
+        this.speed = speed;
+    }
 
     /**
      * @return the longitude
@@ -107,6 +135,15 @@ public class PositionData  implements Serializable {
      */
     public void setAltitude(final double altitude) {
         this.altitude = altitude;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
 

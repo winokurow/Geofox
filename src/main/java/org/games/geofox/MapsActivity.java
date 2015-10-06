@@ -12,6 +12,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,11 +25,16 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.games.geofox.entities.GameStatus;
 import org.games.geofox.entities.PositionData;
 import org.games.geofox.geofox.service.ServiceGPS;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity  implements LocationListener {
 
@@ -38,7 +45,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
     DialogFragment dlg1;
     public final static String BROADCAST_ACTION = "geofox.update";
     BroadcastReceiver br;
-
+    private Map<Marker, PositionData> markersContent = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +77,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
         }
 
         mMap.clear();
-        setUpMap(currentLatitude, currentLongitude);
+        setUpMap(new PositionData("", currentLatitude, currentLongitude));
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(currentLatitude, currentLongitude))      // Sets the center of the map to location user
@@ -80,10 +87,45 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
+        // Setting a custom info window adapter for the google map
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            // Use default InfoWindow frame
+            @Override
+            public View getInfoWindow(Marker arg0) {
+                return null;
+            }
+
+            // Defines the contents of the InfoWindow
+            @Override
+            public View getInfoContents(Marker arg0) {
+
+                // Getting view from the layout file info_window_layout
+                View v = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+
+                // Getting the position from the marker
+                PositionData position = markersContent.get(arg0);
+
+                TextView tvName = (TextView) v.findViewById(R.id.tv_name);
+                TextView tvAlt = (TextView) v.findViewById(R.id.tv_alt);
+                TextView tvAcc = (TextView) v.findViewById(R.id.tv_acc);
+                TextView tvSpeed = (TextView) v.findViewById(R.id.tv_speed);
+
+                tvName.setText("Name: " + position.getName());
+                tvAlt.setText("Altitude: " + position.getAltitude());
+                tvAcc.setText("Accuracy: " + position.getAccuracy());
+                tvSpeed.setText("Speed: " + position.getSpeed());
+                // Returning the view containing InfoWindow contents
+                return v;
+
+            }
+        });
+
         // создаем BroadcastReceiver
         br = new BroadcastReceiver() {
             // действия при получении сообщений
             public void onReceive(Context context, Intent intent) {
+                markersContent = new HashMap<Marker, PositionData>();
                 GameStatus status = (GameStatus) intent.getSerializableExtra("gamestatus");
                 if (status.getGamestatus() != 10) {
                     if (dlg1.isVisible()) {
@@ -96,19 +138,28 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                         intent1.putExtra("status", status.getGamestatus());
                         startActivity(intent1);
                     }
+
+                    Iterator it = markersContent.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry pair = (Map.Entry)it.next();
+                        ((Marker)pair.getKey()).remove();
+                        System.out.println(pair.getKey() + " = " + pair.getValue());
+                        it.remove(); // avoids a ConcurrentModificationException
+                    }
                     mMap.clear();
+
                     double radius = 0.0;
                     float[] results = new float[1];
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     if ((status.getFoxposition().getLatitude() != status.getMyposition().getLatitude())
                             && (status.getFoxposition().getLongitude() != status.getMyposition().getLongitude())) {
-                        setUpMap(status.getMyposition().getLatitude(), status.getMyposition().getLongitude());
+                        setUpMap(status.getMyposition());
                         builder.include(new LatLng(status.getMyposition().getLatitude(), status.getMyposition().getLongitude()));
                     }
-                    setUpFox(status.getFoxposition().getLatitude(), status.getFoxposition().getLongitude());
+                    setUpFox(status.getFoxposition());
                     builder.include(new LatLng(status.getFoxposition().getLatitude(), status.getFoxposition().getLongitude()));
                     for (PositionData positionData : status.getHuntersposition()) {
-                        setUpHunter(positionData.getLatitude(), positionData.getLongitude());
+                        setUpHunter(positionData);
                         builder.include(new LatLng(positionData.getLatitude(), positionData.getLongitude()));
                     }
 
@@ -157,13 +208,16 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpMap(double lat, double lon) {
+    private void setUpMap(PositionData position) {
         Circle circle = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(lat, lon))
+                .center(new LatLng(position.getLatitude(), position.getLongitude()))
                 .radius(50)
                 .strokeColor(Color.BLACK)
                 .fillColor(Color.TRANSPARENT));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).title("Marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.greenmarker)));
+
+        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(position.getLatitude(), position.getLongitude())).title("Marker").
+                icon(BitmapDescriptorFactory.fromResource(R.drawable.greenmarker)));
+        markersContent.put(marker, position);
     }
 
     /**
@@ -172,9 +226,10 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpFox(double lat, double lon) {
+    private void setUpFox(PositionData position) {
 
-        mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).title("Marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.redmarker)));
+        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(position.getLatitude(), position.getLongitude())).title("Marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.redmarker)));
+        markersContent.put(marker, position);
     }
 
     /**
@@ -183,14 +238,15 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpHunter(double lat, double lon) {
+    private void setUpHunter(PositionData position) {
 
         Circle circle = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(lat, lon))
+                .center(new LatLng(position.getLatitude(), position.getLongitude()))
                 .radius(50)
                 .strokeColor(Color.BLACK)
                 .fillColor(Color.TRANSPARENT));
-        mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lon)).title("Marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluemarker)));
+        Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(position.getLatitude(), position.getLongitude())).title("Marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluemarker)));
+        markersContent.put(marker, position);
 
     }
 
