@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -31,7 +33,7 @@ import java.util.Map;
 /**
  * Created by Ilja.Winokurow on 11.09.2015.
  */
-public class RepeatingAlarmService extends BroadcastReceiver {
+public class RepeatingAlarmService extends BroadcastReceiver implements LocationListener {
 
     public String sessionid;
     public String version;
@@ -46,7 +48,9 @@ public class RepeatingAlarmService extends BroadcastReceiver {
         String url = intent.getExtras().getString("url");
         version = intent.getExtras().getString("version");
 
+        Log.e("+++++++++++++++DEBUG6", sessionid);
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1000, this);
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, false);
         Location location = locationManager.getLastKnownLocation(bestProvider);
@@ -62,13 +66,6 @@ public class RepeatingAlarmService extends BroadcastReceiver {
              accuracy = location.getAccuracy();
              alt = location.getAltitude();
         }
-/*        try {
-            lat = location.getLatitude();
-            lon = location.getLongitude();
-        } catch (NullPointerException e) {
-            lat = -1.0;
-            lon = -1.0;
-        }*/
 
         Log.e("abd", "Session Id." + sessionid);
         Toast.makeText(context, "It's Service Time!" + sessionid, Toast.LENGTH_LONG).show();
@@ -101,7 +98,7 @@ public class RepeatingAlarmService extends BroadcastReceiver {
                     if (retr != null) {
                         Intent intent1 = new Intent(MapsActivity.BROADCAST_ACTION);
                         intent1.putExtra("gamestatus", retr);
-                        Log.e("DEBUG123", "6");
+                        intent1.putExtra("message", "ok");
                         try {
                             context.sendBroadcast(intent1);
                         } catch (Exception e) {
@@ -116,7 +113,20 @@ public class RepeatingAlarmService extends BroadcastReceiver {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("DEBUG123","Error");
+                if (error.networkResponse  != null) {
+
+                    if (error.networkResponse.headers.get("error") != null) {
+                        Log.e("DEBUG123", error.networkResponse.headers.get("error"));
+
+                        if (error.networkResponse.headers.get("error").contains("Not Authorized")) {
+                            Log.e("DEBUG123", "here");
+
+                            Intent intent1 = new Intent(MapsActivity.BROADCAST_ACTION);
+                            intent1.putExtra("message", "error");
+                            context.sendBroadcast(intent1);
+                        }
+                    }
+                }
             }
         }
         ){
@@ -129,6 +139,26 @@ public class RepeatingAlarmService extends BroadcastReceiver {
             }};
 
         queue.add(jsObjRequest);
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
 
     }
 }

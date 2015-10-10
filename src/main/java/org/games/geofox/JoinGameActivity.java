@@ -177,17 +177,14 @@ public class JoinGameActivity extends ActionBarActivity {
                 findViewById(R.id.okButton).setEnabled(true);
                 findViewById(R.id.cancelButton).setEnabled(true);
 
-                Intent intent1 = new Intent(context, ServiceGPS.class);
+                Intent intent = new Intent(context, MapsActivity.class);
+                intent.putExtra("version", version);
+                intent.putExtra("url", url);
                 try {
-                    intent1.putExtra("sessionid", response.getString("gameid"));
+                    intent.putExtra("sessionid", response.getString("gameid"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                intent1.putExtra("version", version);
-                intent1.putExtra("url", url);
-                startService(intent1);
-                Intent intent = new Intent(context, MapsActivity.class);
-                intent.putExtra("typ", 1);
                 startActivity(intent);
             }
         }, new Response.ErrorListener() {

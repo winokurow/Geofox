@@ -6,12 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,7 +20,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -52,40 +51,14 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
 
         super.onCreate(savedInstanceState);
 
-        dlg1 = new StartFragment();
+        this.dlg1 = new StartFragment();
         setContentView(R.layout.activity_maps);
         Context context = this;
         mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(
                 R.id.map)).getMap();
-        LocationManager locationManager =
+        locationManager =
                 (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        String mlocProvider;
-        Criteria hdCrit = new Criteria();
-
-        hdCrit.setAccuracy(Criteria.ACCURACY_COARSE);
-
-        mlocProvider = locationManager.getBestProvider(hdCrit, true);
-
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1000, this);
-        double currentLatitude = 0.0;
-        double currentLongitude = 0.0;
-        Location currentLocation = locationManager.getLastKnownLocation(mlocProvider);
-        if (currentLocation != null) {
-             currentLatitude = currentLocation.getLatitude();
-             currentLongitude = currentLocation.getLongitude();
-        }
-
-        mMap.clear();
-        setUpMap(new PositionData("", currentLatitude, currentLongitude));
-
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(currentLatitude, currentLongitude))      // Sets the center of the map to location user
-                .zoom(17)                   // Sets the zoom
-                .bearing(90)                // Sets the orientation of the camera to east
-                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
         // Setting a custom info window adapter for the google map
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -126,6 +99,17 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
             // действия при получении сообщений
             public void onReceive(Context context, Intent intent) {
                 markersContent = new HashMap<Marker, PositionData>();
+                String message = "rere";
+                message = intent.getStringExtra("message");
+                Log.e("DEBUG123", message);
+                if (message.contains("error")) {
+                    Intent intent2 = new Intent(context, ServiceGPS.class);
+                    stopService(intent2);
+
+                    Intent intent1 = new Intent(context, MainActivity.class);
+                    intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent1);
+                } else {
                 GameStatus status = (GameStatus) intent.getSerializableExtra("gamestatus");
                 if (status.getGamestatus() != 10) {
                     if (dlg1.isVisible()) {
@@ -133,7 +117,6 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                     }
 
                     if (status.getGamestatus() > 0) {
-                        stopService(new Intent(context, ServiceGPS.class));
                         Intent intent1 = new Intent(context, EndActivity.class);
                         intent1.putExtra("status", status.getGamestatus());
                         startActivity(intent1);
@@ -171,12 +154,18 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                     if (!(dlg1.isVisible())) {
                         dlg1.show(getFragmentManager(), "dlg1");
                     }
-
+                }
                 }
             }
         };
         this.registerReceiver(br, new IntentFilter(
                 BROADCAST_ACTION));
+
+        Intent intent1 = new Intent(context, ServiceGPS.class);
+        intent1.putExtra("sessionid", this.getIntent().getStringExtra("sessionid"));
+        intent1.putExtra("version", this.getIntent().getStringExtra("version"));
+        intent1.putExtra("url", this.getIntent().getStringExtra("url"));
+        startService(intent1);
     }
 
     @Override
@@ -247,7 +236,6 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                 .fillColor(Color.TRANSPARENT));
         Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(position.getLatitude(), position.getLongitude())).title("Marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluemarker)));
         markersContent.put(marker, position);
-
     }
 
     @Override

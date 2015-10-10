@@ -15,7 +15,7 @@ import android.widget.Toast;
 public class ServiceGPS extends Service {
 
 public static final int INTERVAL = 30000; // 10 sec
-public static final int FIRST_RUN = 2000; // 5 seconds
+public static final int FIRST_RUN = 1; // 5 seconds
         int REQUEST_CODE = 11223344;
 public String sessionid;
     public String version;
@@ -34,9 +34,6 @@ public String sessionid;
 @Override
 public void onCreate() {
         super.onCreate();
-
-
-        Log.v(this.getClass().getName(), "onCreate(..)");
         }
 
     @Override
@@ -46,13 +43,16 @@ public void onCreate() {
             sessionid = intent.getStringExtra("sessionid");
             version = intent.getStringExtra("version");
             url = intent.getStringExtra("url");
-
-
             SharedPreferences.Editor editor = sharedPref.edit();
+
             editor.putString("sessionid", sessionid);
             editor.putString("version", version);
             editor.putString("url", url);
             editor.commit();
+        } else {
+            sessionid = sharedPref.getString("sessionid", "");
+            version = sharedPref.getString("version", "");
+            url = sharedPref.getString("url", "");
         }
         startService();
         return START_NOT_STICKY;
@@ -60,32 +60,37 @@ public void onCreate() {
 
     @Override
 public IBinder onBind(Intent intent) {
-        Log.v(this.getClass().getName(), "onBind(..)");
         onCreate();
         return null;
         }
 
 @Override
 public void onDestroy() {
+    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+    SharedPreferences.Editor editor = sharedPref.edit();
+    editor.putString("sessionid", "");
+    editor.putString("version", "");
+    editor.putString("url", "");
+    editor.commit();
     if (alarmManager != null) {
         Intent intent = new Intent(this, RepeatingAlarmService.class);
         alarmManager.cancel(PendingIntent.getBroadcast(this, REQUEST_CODE, intent, 0));
         }
-        Toast.makeText(this, "Service Stopped!", Toast.LENGTH_LONG).show();
-        Log.v(this.getClass().getName(), "Service onDestroy(). Stop AlarmManager at " + new java.sql.Timestamp(System.currentTimeMillis()).toString());
+    Toast.makeText(this, "Service Stopped!", Toast.LENGTH_LONG).show();
+    Log.v(this.getClass().getName(), "Service onDestroy(). Stop AlarmManager at " + new java.sql.Timestamp(System.currentTimeMillis()).toString());
         }
 
 private void startService() {
     SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-    sessionid = sharedPref.getString("sessionid", "");
-    version = sharedPref.getString("version", "");
-    url = sharedPref.getString("url", "");
 
-        Intent intent = new Intent(this, RepeatingAlarmService.class);
-        intent.putExtra("sessionid", sessionid);
-        intent.putExtra("version", version);
-        intent.putExtra("url", url);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, intent, 0);
+
+    Intent intent = new Intent(this, RepeatingAlarmService.class);
+
+
+    intent.putExtra("sessionid", sessionid);
+    intent.putExtra("version", version);
+    intent.putExtra("url", url);
+    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.setRepeating(

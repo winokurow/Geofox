@@ -19,7 +19,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.games.geofox.common.CommonUtils;
-import org.games.geofox.geofox.service.ServiceGPS;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -172,16 +171,15 @@ public class NewGameActivity extends AppCompatActivity {
                                 findViewById(R.id.okButton).setEnabled(true);
                                 findViewById(R.id.cancelButton).setEnabled(true);
 
-                                Intent intent1 = new Intent(context, ServiceGPS.class);
+                                Intent intent = new Intent(context, MapsActivity.class);
+                                intent.putExtra("version", version);
+                                intent.putExtra("url", url);
                                 try {
-                                    intent1.putExtra("sessionid", response.getString("gameid"));
+                                    intent.putExtra("sessionid", response.getString("gameid"));
+                                    intent.putExtra("message", response.getString("ok"));
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                intent1.putExtra("version", version);
-                                intent1.putExtra("url", url);
-                                startService(intent1);
-                                Intent intent = new Intent(context, MapsActivity.class);
                                 startActivity(intent);
                             }
                 }, new Response.ErrorListener() {
