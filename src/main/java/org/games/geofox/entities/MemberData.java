@@ -8,10 +8,10 @@ import java.io.Serializable;
  * Position.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PositionData  implements Serializable {
+public class MemberData implements Serializable {
 
 
-    public PositionData(String name, double latitude, double longitude) {
+    public MemberData(String name, double latitude, double longitude) {
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -20,8 +20,12 @@ public class PositionData  implements Serializable {
     /**
      * Name.
      */
-
     private String name;
+
+    /**
+     * Type.
+     */
+    private int typ;
 
     /**
      * Longitude.
@@ -49,12 +53,13 @@ public class PositionData  implements Serializable {
     private double speed;
 
     //Introducing the dummy constructor
-    public PositionData() {
+    public MemberData() {
     }
 
 
-    public PositionData(String name, double longitude, double latitude, double accuracy, double altitude, double speed) {
+    public MemberData(String name, int typ, double longitude, double latitude, double accuracy, double altitude, double speed) {
         this.name = name;
+        this.typ = typ;
         this.longitude = longitude;
         this.latitude = latitude;
         this.accuracy = accuracy;
@@ -144,6 +149,14 @@ public class PositionData  implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getTyp() {
+        return typ;
+    }
+
+    public void setTyp(int typ) {
+        this.typ = typ;
     }
 }
 

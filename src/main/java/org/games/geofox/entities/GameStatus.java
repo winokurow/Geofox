@@ -31,14 +31,14 @@ public class GameStatus implements Serializable {
     /**
      * myposition
      */
-    private PositionData myposition;
+    private MemberData myposition;
 
     /**
      * foxposition
      */
-    private PositionData foxposition;
+    private MemberData foxposition;
 
-    List<PositionData> huntersposition;
+    List<MemberData> huntersposition;
 
     /**
      * @return the gamestatus
@@ -73,7 +73,7 @@ public class GameStatus implements Serializable {
     /**
      * @return the myposition
      */
-    public PositionData getMyposition() {
+    public MemberData getMyposition() {
         return myposition;
     }
 
@@ -81,14 +81,14 @@ public class GameStatus implements Serializable {
      * @param myposition
      *          the myposition to set
      */
-    public void setMyposition(final PositionData myposition) {
+    public void setMyposition(final MemberData myposition) {
         this.myposition = myposition;
     }
 
     /**
      * @return the foxposition
      */
-    public PositionData getFoxposition() {
+    public MemberData getFoxposition() {
         return foxposition;
     }
 
@@ -96,15 +96,15 @@ public class GameStatus implements Serializable {
      * @param foxposition
      *          the foxposition to set
      */
-    public void setFoxposition(final PositionData foxposition) {
+    public void setFoxposition(final MemberData foxposition) {
         this.foxposition = foxposition;
     }
 
-    public List<PositionData> getHuntersposition() {
+    public List<MemberData> getHuntersposition() {
         return huntersposition;
     }
 
-    public void setHuntersposition(List<PositionData> huntersposition) {
+    public void setHuntersposition(List<MemberData> huntersposition) {
 
         this.huntersposition = huntersposition;
     }

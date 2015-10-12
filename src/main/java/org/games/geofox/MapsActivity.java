@@ -11,7 +11,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,9 +27,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.games.geofox.entities.GameStatus;
-import org.games.geofox.entities.PositionData;
+import org.games.geofox.entities.MemberData;
 import org.games.geofox.geofox.service.ServiceGPS;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
     DialogFragment dlg1;
     public final static String BROADCAST_ACTION = "geofox.update";
     BroadcastReceiver br;
-    private Map<Marker, PositionData> markersContent = new HashMap<>();
+    private Map<Marker, MemberData> markersContent = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +77,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                 View v = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
 
                 // Getting the position from the marker
-                PositionData position = markersContent.get(arg0);
+                MemberData position = markersContent.get(arg0);
 
                 TextView tvName = (TextView) v.findViewById(R.id.tv_name);
                 TextView tvAlt = (TextView) v.findViewById(R.id.tv_alt);
@@ -98,10 +98,9 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
         br = new BroadcastReceiver() {
             // действия при получении сообщений
             public void onReceive(Context context, Intent intent) {
-                markersContent = new HashMap<Marker, PositionData>();
+                markersContent = new HashMap<Marker, MemberData>();
                 String message = "rere";
                 message = intent.getStringExtra("message");
-                Log.e("DEBUG123", message);
                 if (message.contains("error")) {
                     Intent intent2 = new Intent(context, ServiceGPS.class);
                     stopService(intent2);
@@ -111,6 +110,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                     startActivity(intent1);
                 } else {
                 GameStatus status = (GameStatus) intent.getSerializableExtra("gamestatus");
+
                 if (status.getGamestatus() != 10) {
                     if (dlg1.isVisible()) {
                         dlg1.dismiss();
@@ -121,6 +121,24 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                         intent1.putExtra("status", status.getGamestatus());
                         startActivity(intent1);
                     }
+                    String text = "Distance:";
+                    float[] results = new float[1];
+                    if (status.getMyposition().getTyp() == 2) {
+                        Location.distanceBetween(status.getMyposition().getLatitude(), status.getMyposition().getLongitude(),
+                                status.getFoxposition().getLatitude(), status.getFoxposition().getLongitude(), results);
+                        text = "Distance to fox: " + new DecimalFormat("#.##").format(results[0]) + " м";
+                    } if (status.getMyposition().getTyp() == 1) {
+                        float distance = 0.00f;
+                        for (MemberData positionData : status.getHuntersposition()) {
+                            Location.distanceBetween(status.getMyposition().getLatitude(), status.getMyposition().getLongitude(),
+                                    positionData.getLatitude(), positionData.getLongitude(), results);
+                            distance = distance<results[0]?results[0]:distance;
+                            text = "Minimal distance to hunter: " + new DecimalFormat("#.##").format(distance) + " м";
+                        }
+
+                    }
+                    TextView gamenameEditText = (TextView) findViewById(R.id.distance);
+                    gamenameEditText.setText(text);
 
                     Iterator it = markersContent.entrySet().iterator();
                     while (it.hasNext()) {
@@ -130,18 +148,14 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                         it.remove(); // avoids a ConcurrentModificationException
                     }
                     mMap.clear();
-
-                    double radius = 0.0;
-                    float[] results = new float[1];
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    if ((status.getFoxposition().getLatitude() != status.getMyposition().getLatitude())
-                            && (status.getFoxposition().getLongitude() != status.getMyposition().getLongitude())) {
+                    if (status.getMyposition().getTyp()==2) {
                         setUpMap(status.getMyposition());
                         builder.include(new LatLng(status.getMyposition().getLatitude(), status.getMyposition().getLongitude()));
                     }
                     setUpFox(status.getFoxposition());
                     builder.include(new LatLng(status.getFoxposition().getLatitude(), status.getFoxposition().getLongitude()));
-                    for (PositionData positionData : status.getHuntersposition()) {
+                    for (MemberData positionData : status.getHuntersposition()) {
                         setUpHunter(positionData);
                         builder.include(new LatLng(positionData.getLatitude(), positionData.getLongitude()));
                     }
@@ -197,7 +211,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpMap(PositionData position) {
+    private void setUpMap(MemberData position) {
         Circle circle = mMap.addCircle(new CircleOptions()
                 .center(new LatLng(position.getLatitude(), position.getLongitude()))
                 .radius(50)
@@ -215,7 +229,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpFox(PositionData position) {
+    private void setUpFox(MemberData position) {
 
         Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(position.getLatitude(), position.getLongitude())).title("Marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.redmarker)));
         markersContent.put(marker, position);
@@ -227,7 +241,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpHunter(PositionData position) {
+    private void setUpHunter(MemberData position) {
 
         Circle circle = mMap.addCircle(new CircleOptions()
                 .center(new LatLng(position.getLatitude(), position.getLongitude()))

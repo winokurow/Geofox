@@ -27,8 +27,10 @@ import org.games.geofox.entities.GameStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Ilja.Winokurow on 11.09.2015.
@@ -40,6 +42,7 @@ public class RepeatingAlarmService extends BroadcastReceiver implements Location
     GameStatus retr;
     String test;
     Context context;
+    Date startdate = new Date();
 
     @Override
     public void onReceive(Context context1, Intent intent) {
@@ -47,8 +50,15 @@ public class RepeatingAlarmService extends BroadcastReceiver implements Location
         sessionid = intent.getExtras().getString("sessionid");
         String url = intent.getExtras().getString("url");
         version = intent.getExtras().getString("version");
+        startdate.setTime(intent.getLongExtra("date", -1));
 
-        Log.e("+++++++++++++++DEBUG6", sessionid);
+        Date now = new Date();
+        long duration = now.getTime() - startdate.getTime();
+        if ( TimeUnit.MILLISECONDS.toHours(duration)>3) {
+            Intent intent2 = new Intent(context, ServiceGPS.class);
+            context1.stopService(intent2);
+        }
+
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 1000, this);
         Criteria criteria = new Criteria();
@@ -115,15 +125,12 @@ public class RepeatingAlarmService extends BroadcastReceiver implements Location
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse  != null) {
 
-                    if (error.networkResponse.headers.get("error") != null) {
-                        Log.e("DEBUG123", error.networkResponse.headers.get("error"));
+                    if (error.networkResponse.headers.get("errorcode") != null) {
 
-                        if (error.networkResponse.headers.get("error").contains("Not Authorized")) {
-                            Log.e("DEBUG123", "here");
-
-                            Intent intent1 = new Intent(MapsActivity.BROADCAST_ACTION);
-                            intent1.putExtra("message", "error");
-                            context.sendBroadcast(intent1);
+                        if (error.networkResponse.headers.get("errorcode").contains("4010")) {
+                            Intent intent = new Intent(MapsActivity.BROADCAST_ACTION);
+                            intent.putExtra("message", "error");
+                            context.sendBroadcast(intent);
                         }
                     }
                 }

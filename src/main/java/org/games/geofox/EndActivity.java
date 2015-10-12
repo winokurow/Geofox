@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import org.games.geofox.geofox.service.ServiceGPS;
+
 public class EndActivity extends AppCompatActivity {
 
     @Override
@@ -20,7 +22,7 @@ public class EndActivity extends AppCompatActivity {
             TextView statusText = (TextView) findViewById(R.id.statustext);
             statusText.setText("The Fox is caught.");
         }
-        if (status==1) {
+        if (status==2) {
             TextView statusText = (TextView) findViewById(R.id.statustext);
             statusText.setText("The Fox has won.");
         }
@@ -61,7 +63,9 @@ public class EndActivity extends AppCompatActivity {
      /
      */
     public void doEndGame(View view) {
-        //System.exit(0);
+        Intent intent2 = new Intent(this, ServiceGPS.class);
+        this.stopService(intent2);
+
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);

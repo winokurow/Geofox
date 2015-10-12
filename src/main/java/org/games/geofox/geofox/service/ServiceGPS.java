@@ -12,6 +12,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Date;
+
 public class ServiceGPS extends Service {
 
 public static final int INTERVAL = 30000; // 10 sec
@@ -85,8 +87,8 @@ private void startService() {
 
 
     Intent intent = new Intent(this, RepeatingAlarmService.class);
-
-
+    Date date = new Date();
+    intent.putExtra("date", date.getTime());
     intent.putExtra("sessionid", sessionid);
     intent.putExtra("version", version);
     intent.putExtra("url", url);
