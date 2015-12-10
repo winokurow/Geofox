@@ -20,10 +20,12 @@ public class GameStatus implements Serializable {
      */
     private int gamestatus;
 
-
+    /**
+     * gametype
+     */
+    private int gametype;
 
     /**
-
      * gamestatusmessage
      */
     private String gamestatusmessage;
@@ -53,6 +55,14 @@ public class GameStatus implements Serializable {
      */
     public void setGamestatus(final int gamestatus) {
         this.gamestatus = gamestatus;
+    }
+
+    public int getGametype() {
+        return gametype;
+    }
+
+    public void setGametype(int gametype) {
+        this.gametype = gametype;
     }
 
     /**

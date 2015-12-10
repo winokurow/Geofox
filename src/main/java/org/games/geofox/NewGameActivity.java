@@ -176,6 +176,9 @@ public class NewGameActivity extends AppCompatActivity {
                                 intent.putExtra("url", url);
                                 try {
                                     intent.putExtra("sessionid", response.getString("gameid"));
+
+                                    intent.putExtra("serviceinterval", response.getInt("serviceinterval"));
+                                    intent.putExtra("servicefirstrun", response.getInt("servicefirstrun"));
                                     intent.putExtra("message", response.getString("ok"));
                                 } catch (JSONException e) {
                                     e.printStackTrace();

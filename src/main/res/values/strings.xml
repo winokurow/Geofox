@@ -31,4 +31,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_custom_info_contents">custom_info_contents</string>
 
+    <!-- Info dialog -->
+    <string name="dialog_name">"Name: %1$s"</string>
+    <string name="dialog_altitude">"Altitude: %1$s"</string>
+    <string name="dialog_accuracy">"Accuracy: %1$s"</string>
+    <string name="dialog_speed">"Speed: %1$s"</string>
 </resources>

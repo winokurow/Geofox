@@ -55,6 +55,7 @@ public class RepeatingAlarmService extends BroadcastReceiver implements Location
         Date now = new Date();
         long duration = now.getTime() - startdate.getTime();
         if ( TimeUnit.MILLISECONDS.toHours(duration)>3) {
+
             Intent intent2 = new Intent(context, ServiceGPS.class);
             context1.stopService(intent2);
         }
@@ -104,6 +105,8 @@ public class RepeatingAlarmService extends BroadcastReceiver implements Location
                 mapper.setAnnotationIntrospector(introspector);
                 try {
                     retr = mapper.readValue(response.toString(), GameStatus.class);
+                    Log.e("DEBUG123", response.toString());
+                    Log.e("DEBUG123", retr.getMyposition().getTyp().toString());
                     test = retr.toString();
                     if (retr != null) {
                         Intent intent1 = new Intent(MapsActivity.BROADCAST_ACTION);

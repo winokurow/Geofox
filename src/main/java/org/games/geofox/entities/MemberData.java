@@ -2,6 +2,8 @@ package org.games.geofox.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.games.geofox.org.games.geofox.data.MemberTyp;
+
 import java.io.Serializable;
 
 /**
@@ -25,7 +27,7 @@ public class MemberData implements Serializable {
     /**
      * Type.
      */
-    private int typ;
+    private MemberTyp typ;
 
     /**
      * Longitude.
@@ -57,7 +59,7 @@ public class MemberData implements Serializable {
     }
 
 
-    public MemberData(String name, int typ, double longitude, double latitude, double accuracy, double altitude, double speed) {
+    public MemberData(String name, MemberTyp typ, double longitude, double latitude, double accuracy, double altitude, double speed) {
         this.name = name;
         this.typ = typ;
         this.longitude = longitude;
@@ -90,7 +92,7 @@ public class MemberData implements Serializable {
     }
 
     /**
-     * @param Latitude
+     * @param latitude
      *          the Latitude to set
      */
     public void setLatitude(final double latitude) {
@@ -151,11 +153,11 @@ public class MemberData implements Serializable {
         this.name = name;
     }
 
-    public int getTyp() {
+    public MemberTyp getTyp() {
         return typ;
     }
 
-    public void setTyp(int typ) {
+    public void setTyp(MemberTyp typ) {
         this.typ = typ;
     }
 }
