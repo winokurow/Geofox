@@ -12,13 +12,6 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MemberData implements Serializable {
 
-
-    public MemberData(String name, double latitude, double longitude) {
-        this.name = name;
-        this.longitude = longitude;
-        this.latitude = latitude;
-    }
-
     /**
      * Name.
      */
@@ -53,6 +46,12 @@ public class MemberData implements Serializable {
      * Speed.
      */
     private double speed;
+
+    public MemberData(String name, double latitude, double longitude) {
+        this.name = name;
+        this.longitude = longitude;
+        this.latitude = latitude;
+    }
 
     //Introducing the dummy constructor
     public MemberData() {

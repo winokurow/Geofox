@@ -184,6 +184,8 @@ public class JoinGameActivity extends ActionBarActivity {
                     intent.putExtra("sessionid", response.getString("gameid"));
                     intent.putExtra("serviceinterval", response.getInt("serviceinterval"));
                     intent.putExtra("servicefirstrun", response.getInt("servicefirstrun"));
+                    intent.putExtra("gamelength", response.getInt("gamelength"));
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

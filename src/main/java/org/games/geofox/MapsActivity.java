@@ -44,6 +44,8 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
     DialogFragment dlg2;
     public final static String BROADCAST_ACTION = "geofox.update";
     BroadcastReceiver br;
+
+    // List of all map markers
     private Map<Marker, MemberData> markersContent = new HashMap<>();
 
     @Override
@@ -79,38 +81,7 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                 3000, 1000, this);
 
         // Setting a custom info window adapter for the google map
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-
-            // Use default InfoWindow frame
-            @Override
-            public View getInfoWindow(Marker arg0) {
-                return null;
-            }
-
-            // Defines the contents of the InfoWindow
-            @Override
-            public View getInfoContents(Marker arg0) {
-
-                // Getting view from the layout file info_window_layout
-                View v = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
-
-                // Getting the position from the marker
-                MemberData position = markersContent.get(arg0);
-
-                TextView tvName = (TextView) v.findViewById(R.id.tv_name);
-                TextView tvAlt = (TextView) v.findViewById(R.id.tv_alt);
-                TextView tvAcc = (TextView) v.findViewById(R.id.tv_acc);
-                TextView tvSpeed = (TextView) v.findViewById(R.id.tv_speed);
-
-                tvName.setText(String.format(getString(R.string.dialog_name), position.getName()));
-                tvAlt.setText(String.format(getString(R.string.dialog_altitude), position.getAltitude()));
-                tvAcc.setText(String.format(getString(R.string.dialog_accuracy), position.getAccuracy()));
-                tvSpeed.setText(String.format(getString(R.string.dialog_speed), position.getSpeed()));
-                // Returning the view containing InfoWindow contents
-                return v;
-
-            }
-        });
+        mMap.setInfoWindowAdapter(new infoPopup());
 
         // создаем BroadcastReceiver
         br = new BroadcastReceiver() {
@@ -330,4 +301,53 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
         }
         return distance;
     }
+
+    /**
+     * Info Popup that shows player data (name, speed, altitude, accuracy).
+     */
+ class infoPopup implements GoogleMap.InfoWindowAdapter {
+
+     // view
+     private final View myContentsView;
+
+     // constructor
+     infoPopup(){
+         // Getting view from the layout file info_window_layout
+          myContentsView = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+     }
+
+     // Use default InfoWindow frame
+     @Override
+     public View getInfoWindow(Marker arg0) {
+         return null;
+     }
+
+     // Defines the contents of the InfoWindow
+     @Override
+     public View getInfoContents(Marker arg0) {
+
+         // Getting the position from the marker
+         if (markersContent.containsKey(arg0)) {
+             MemberData position = markersContent.get(arg0);
+
+             TextView tvName = (TextView) myContentsView.findViewById(R.id.tv_name);
+             TextView tvAlt = (TextView) myContentsView.findViewById(R.id.tv_alt);
+             TextView tvAcc = (TextView) myContentsView.findViewById(R.id.tv_acc);
+             TextView tvSpeed = (TextView) myContentsView.findViewById(R.id.tv_speed);
+
+             String name = "";
+             if (position.getName() != null) {
+                 name = position.getName();
+             }
+             tvName.setText(String.format(getString(R.string.dialog_name), name));
+
+             tvAlt.setText(String.format(getString(R.string.dialog_altitude), position.getAltitude()));
+             tvAcc.setText(String.format(getString(R.string.dialog_accuracy), position.getAccuracy()));
+             tvSpeed.setText(String.format(getString(R.string.dialog_speed), position.getSpeed()));
+         }
+         // Returning the view containing InfoWindow contents
+         return myContentsView;
+
+     }
+ }
 }

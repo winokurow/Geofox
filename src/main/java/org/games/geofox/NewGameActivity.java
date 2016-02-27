@@ -180,6 +180,7 @@ public class NewGameActivity extends AppCompatActivity {
                                     intent.putExtra("serviceinterval", response.getInt("serviceinterval"));
                                     intent.putExtra("servicefirstrun", response.getInt("servicefirstrun"));
                                     intent.putExtra("message", response.getString("ok"));
+                                    intent.putExtra("gamelength", response.getInt("gamelength"));
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

@@ -40,6 +40,7 @@ public class RepeatingAlarmService extends BroadcastReceiver implements Location
     public String sessionid;
     public String version;
     GameStatus retr;
+    int gamelength;
     String test;
     Context context;
     Date startdate = new Date();
@@ -50,11 +51,12 @@ public class RepeatingAlarmService extends BroadcastReceiver implements Location
         sessionid = intent.getExtras().getString("sessionid");
         String url = intent.getExtras().getString("url");
         version = intent.getExtras().getString("version");
+        gamelength = intent.getExtras().getInt("gamelength");
         startdate.setTime(intent.getLongExtra("date", -1));
 
         Date now = new Date();
         long duration = now.getTime() - startdate.getTime();
-        if ( TimeUnit.MILLISECONDS.toHours(duration)>3) {
+        if ( TimeUnit.MILLISECONDS.toMinutes(duration)>gamelength) {
 
             Intent intent2 = new Intent(context, ServiceGPS.class);
             context1.stopService(intent2);

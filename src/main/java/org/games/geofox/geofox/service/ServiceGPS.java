@@ -18,6 +18,7 @@ public class ServiceGPS extends Service {
 
 public static int interval = 30000; // 10 sec
 public static int first_run = 1000; // 5 seconds
+public static int game_length = 180; // 3 hour
         int REQUEST_CODE = 11223344;
 public String sessionid;
     public String version;
@@ -48,6 +49,7 @@ public void onCreate() {
             url = intent.getStringExtra("url");
             interval = intent.getIntExtra("serviceinterval", 30000);
             first_run = intent.getIntExtra("servicefirstrun", 1000);
+            game_length = intent.getIntExtra("gamelength", 180);
 
             SharedPreferences.Editor editor = sharedPref.edit();
 
@@ -56,6 +58,7 @@ public void onCreate() {
             editor.putString("url", url);
             editor.putInt("serviceinterval", interval);
             editor.putInt("servicefirstrun", first_run);
+            editor.putInt("gamelength", game_length);
             editor.commit();
         } else {
             sessionid = sharedPref.getString("sessionid", "");
@@ -63,6 +66,7 @@ public void onCreate() {
             url = sharedPref.getString("url", "");
             interval = sharedPref.getInt("serviceinterval", 30000);
             first_run = sharedPref.getInt("servicefirstrun", 1000);
+            game_length = sharedPref.getInt("gamelength", 180);
         }
         startService();
         return START_NOT_STICKY;
@@ -86,6 +90,7 @@ public void onDestroy() {
     editor.putString("url", "");
     editor.putString("serviceinterval", "");
     editor.putString("servicefirstrun", "");
+    editor.putString("gamelength", "");
 
     editor.commit();
     if (alarmManager != null) {
@@ -106,6 +111,8 @@ private void startService() {
     intent.putExtra("sessionid", sessionid);
     intent.putExtra("version", version);
     intent.putExtra("url", url);
+    intent.putExtra("gamelength", game_length);
+
 
     PendingIntent pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
