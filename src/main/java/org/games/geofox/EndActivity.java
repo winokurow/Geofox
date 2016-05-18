@@ -18,19 +18,19 @@ public class EndActivity extends AppCompatActivity {
         setContentView(R.layout.activity_end);
         Intent intent = getIntent();
         int status = intent.getIntExtra("status", 1);
-        if (status==1) {
+        if (status==40) {
             TextView statusText = (TextView) findViewById(R.id.statustext);
             statusText.setText("The Fox is caught.");
         }
-        if (status==2) {
+        if (status==50) {
             TextView statusText = (TextView) findViewById(R.id.statustext);
             statusText.setText("The Fox has won.");
         }
-        if (status==3) {
+        if (status==60) {
             TextView statusText = (TextView) findViewById(R.id.statustext);
             statusText.setText("The Fox is lost by timeout.");
         }
-        if (status==4) {
+        if (status==70) {
             TextView statusText = (TextView) findViewById(R.id.statustext);
             statusText.setText("The hunters is lost by timeout.");
         }

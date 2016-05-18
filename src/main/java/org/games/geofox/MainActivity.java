@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         if (isMyServiceRunning(ServiceGPS.class)) {
             Intent intent = new Intent(this, MapsActivity.class);
-            intent.putExtra("typ", 1);
+            intent.putExtra("isRunning", 1);
             startActivity(intent);
         }
         super.onCreate(savedInstanceState);

@@ -23,6 +23,7 @@
     <string name="ERROR_ERR1">ERROR: The user with this name is already in game.</string>
     <string name="ERROR_ERR2">ERROR: The game with this name is already exists.</string>
     <string name="ERROR_ERR3">ERROR: The game name or password is incorrect.</string>
+    <string name="ERROR_GAME_IS_FULL">The hunters limit is reached.</string>
     <string name="title_activity_end">EndActivity</string>
 
     <string name="hello_world">Hello world!</string>
@@ -36,4 +37,6 @@
     <string name="dialog_altitude">"Altitude: %1$s"</string>
     <string name="dialog_accuracy">"Accuracy: %1$s"</string>
     <string name="dialog_speed">"Speed: %1$s"</string>
+    <string name="map.popupWaitForHunterEnter.message">Waiting for hunters to join the game.</string>
+    <string name="map.popupWaitForHunterDistance.message">Waiting for hunters distance will be more then 500m.</string>
 </resources>

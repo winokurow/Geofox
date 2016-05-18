@@ -113,21 +113,16 @@ public class JoinGameActivity extends ActionBarActivity {
             usernameEditText.setError("This field must have only latin letters and numbers.");
             isError = true;
         }
-
-
         if (!(isError))
         {
             gamenameEditText.setEnabled(false);
             passwordEditText.setEnabled(false);
             usernameEditText.setEnabled(false);
-            post("0", gamename, password, username);
+            post("1", gamename, password, username);
 
             findViewById(R.id.okButton).setEnabled(false);
             findViewById(R.id.cancelButton).setEnabled(false);
         }
-
-
-
     }
 
     /**
@@ -155,7 +150,8 @@ public class JoinGameActivity extends ActionBarActivity {
         JSONObject obj = new JSONObject();
         JSONObject obj1 = new JSONObject();
         try {
-            obj.put("typ", typ);
+            obj.put("gametyp", typ);
+            obj.put("gameExist", "1");
             obj.put("name", name);
             obj.put("password", password);
             obj.put("user", username);
@@ -185,7 +181,6 @@ public class JoinGameActivity extends ActionBarActivity {
                     intent.putExtra("serviceinterval", response.getInt("serviceinterval"));
                     intent.putExtra("servicefirstrun", response.getInt("servicefirstrun"));
                     intent.putExtra("gamelength", response.getInt("gamelength"));
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

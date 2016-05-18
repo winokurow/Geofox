@@ -131,7 +131,7 @@ public class NewGameActivity extends AppCompatActivity {
      * @param password - game password
      * @param username - fox username
      */
-    private void post(String typ, String name,  String password, String username){
+    private void post(String typ, String name, String password, String username){
 
         Properties prop = new Properties();
         AssetManager assetManager = getAssets();
@@ -148,7 +148,8 @@ public class NewGameActivity extends AppCompatActivity {
             JSONObject obj = new JSONObject();
             JSONObject obj1 = new JSONObject();
             try {
-                obj.put("typ", typ);
+                obj.put("gametyp", typ);
+                obj.put("gameExist", "0");
                 obj.put("name", name);
                 obj.put("password", password);
                 obj.put("user", username);
@@ -176,10 +177,8 @@ public class NewGameActivity extends AppCompatActivity {
                                 intent.putExtra("url", url);
                                 try {
                                     intent.putExtra("sessionid", response.getString("gameid"));
-
                                     intent.putExtra("serviceinterval", response.getInt("serviceinterval"));
                                     intent.putExtra("servicefirstrun", response.getInt("servicefirstrun"));
-                                    intent.putExtra("message", response.getString("ok"));
                                     intent.putExtra("gamelength", response.getInt("gamelength"));
                                 } catch (JSONException e) {
                                     e.printStackTrace();

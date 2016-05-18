@@ -12,18 +12,16 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.games.geofox.entities.GameData;
+
 import java.util.Date;
 
 public class ServiceGPS extends Service {
 
-public static int interval = 30000; // 10 sec
-public static int first_run = 1000; // 5 seconds
-public static int game_length = 180; // 3 hour
-        int REQUEST_CODE = 11223344;
-public String sessionid;
-    public String version;
-    public String url;
-        AlarmManager alarmManager;
+    GameData gameData;
+
+    int REQUEST_CODE = 11223344;
+    AlarmManager alarmManager;
 
     private final IBinder binder = new ServiceBinder();
 
@@ -41,32 +39,33 @@ public void onCreate() {
 
     @Override
     public int onStartCommand (Intent intent, int flags, int startId) {
+        gameData = new GameData();
         SharedPreferences sharedPref = this.getSharedPreferences("org.games.geofox.main", Context.MODE_PRIVATE);
 
         if (intent.getStringExtra("sessionid") != null) {
-            sessionid = intent.getStringExtra("sessionid");
-            version = intent.getStringExtra("version");
-            url = intent.getStringExtra("url");
-            interval = intent.getIntExtra("serviceinterval", 30000);
-            first_run = intent.getIntExtra("servicefirstrun", 1000);
-            game_length = intent.getIntExtra("gamelength", 180);
+            gameData.setSessionID(intent.getStringExtra("sessionid"));
+            gameData.setVersion(intent.getStringExtra("version"));
+            gameData.setUrl(intent.getStringExtra("url"));
+            gameData.setServiceinterval(intent.getIntExtra("serviceinterval", 30000));
+            gameData.setServicefirstrun(intent.getIntExtra("servicefirstrun", 1000));
+            gameData.setGamelength(intent.getIntExtra("gamelength", 180));
 
             SharedPreferences.Editor editor = sharedPref.edit();
 
-            editor.putString("sessionid", sessionid);
-            editor.putString("version", version);
-            editor.putString("url", url);
-            editor.putInt("serviceinterval", interval);
-            editor.putInt("servicefirstrun", first_run);
-            editor.putInt("gamelength", game_length);
+            editor.putString("sessionid", gameData.getSessionID());
+            editor.putString("version", gameData.getVersion());
+            editor.putString("url", gameData.getUrl());
+            editor.putInt("serviceinterval", gameData.getServiceinterval());
+            editor.putInt("servicefirstrun", gameData.getServicefirstrun());
+            editor.putInt("gamelength", gameData.getGamelength());
             editor.commit();
         } else {
-            sessionid = sharedPref.getString("sessionid", "");
-            version = sharedPref.getString("version", "");
-            url = sharedPref.getString("url", "");
-            interval = sharedPref.getInt("serviceinterval", 30000);
-            first_run = sharedPref.getInt("servicefirstrun", 1000);
-            game_length = sharedPref.getInt("gamelength", 180);
+            gameData.setSessionID(sharedPref.getString("sessionid", ""));
+            gameData.setVersion(sharedPref.getString("version", ""));
+            gameData.setUrl(sharedPref.getString("url", ""));
+            gameData.setServiceinterval(sharedPref.getInt("serviceinterval", 30000));
+            gameData.setServicefirstrun(sharedPref.getInt("servicefirstrun", 1000));
+            gameData.setGamelength(sharedPref.getInt("gamelength", 180));
         }
         startService();
         return START_NOT_STICKY;
@@ -108,10 +107,10 @@ private void startService() {
     Intent intent = new Intent(this, RepeatingAlarmService.class);
     Date date = new Date();
     intent.putExtra("date", date.getTime());
-    intent.putExtra("sessionid", sessionid);
-    intent.putExtra("version", version);
-    intent.putExtra("url", url);
-    intent.putExtra("gamelength", game_length);
+    intent.putExtra("sessionid", gameData.getSessionID());
+    intent.putExtra("version", gameData.getVersion());
+    intent.putExtra("url", gameData.getUrl());
+    intent.putExtra("gamelength", gameData.getGamelength());
 
 
     PendingIntent pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -119,23 +118,9 @@ private void startService() {
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.setRepeating(
         AlarmManager.ELAPSED_REALTIME_WAKEUP,
-        SystemClock.elapsedRealtime() + first_run,
-                interval,
+        SystemClock.elapsedRealtime() + gameData.getServicefirstrun(),
+                gameData.getServiceinterval(),
         pendingIntent);
-
-
         }
-
-    public void setSessionId(String a) {
-        this.sessionid = a;
-    }
-    public void setUrl(String a) {
-        this.url = a;
-    }
-    public void setVersion(String a) {
-        this.version = a;
-    }
-
-
         }
 

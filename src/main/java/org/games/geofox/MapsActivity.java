@@ -40,34 +40,45 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-    DialogFragment dlg1;
-    DialogFragment dlg2;
+    /** Dialog that shown when awaiting for Hunters*/
+    private DialogFragment dlgAwaitForHunter = new StartFragment();
+
+    /** Dialog that shown when awaiting for Hunters distance>distance_max*/
+    private DialogFragment dlgAwaitForHunterDistance = new StartFragment();
+
     public final static String BROADCAST_ACTION = "geofox.update";
     BroadcastReceiver br;
 
     // List of all map markers
     private Map<Marker, MemberData> markersContent = new HashMap<>();
 
+    /**
+     * Constructor
+     */
+    public MapsActivity() {
+        super();
+        Bundle bundle = new Bundle();
+        bundle.putString("text", getString(R.string.map_popupWaitForHunterEnter_message));
+        this.dlgAwaitForHunter.setArguments(bundle);
+
+        bundle = new Bundle();
+        bundle.putString("text", getString(R.string.map_popupWaitForHunterDistance_message));
+        this.dlgAwaitForHunterDistance.setArguments(bundle);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
-        // Start gps service
         Context context = this;
+        int isRunning = this.getIntent().getIntExtra("isRunning", 0);
+        if (isRunning == 0) {
+            dlgAwaitForHunter.show(getFragmentManager(), "dlgAwaitForHunter");
+        }
+        // Start gps service
         Intent intentGpsService = new Intent(context, ServiceGPS.class);
         intentGpsService.putExtras(this.getIntent());
         startService(intentGpsService);
-
-        Bundle args1 = new Bundle();
-        args1.putString("text", "Waiting for hunters to join the game.");
-        this.dlg1 = new StartFragment();
-        this.dlg1.setArguments(args1);
-
-        Bundle args2 = new Bundle();
-        args2.putString("text", "Waiting for hunters distance will be more then 500m.");
-        this.dlg2 = new StartFragment();
-        this.dlg2.setArguments(args2);
 
         setContentView(R.layout.activity_maps);
 
@@ -99,69 +110,9 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
                     intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent1);
                 } else {
-                GameStatus status = (GameStatus) intent.getSerializableExtra("gamestatus");
+                    GameStatus status = (GameStatus) intent.getSerializableExtra("gamestatus");
                     Log.e("abdeds status", status.toString());
-                if (status.getHuntersposition().size() > 0) {
-                    if (dlg1.isVisible()) {
-                        dlg1.dismiss();
-                        dlg2.show(getFragmentManager(), "dlg2");
-                    }
-                    boolean isDistance = true;
-                    if (dlg2.isVisible()) {
-                        float[] results = new float[1];
-                        for (MemberData positionData : status.getHuntersposition()) {
-                            Location.distanceBetween(status.getFoxposition().getLatitude(), status.getFoxposition().getLongitude(),
-                                    positionData.getLatitude(), positionData.getLongitude(), results);
-                            if (results[0] < 500.00) {
-                                isDistance = false;
-                            }
-                        }
-                    }
-                    if (isDistance) {
-                        if (dlg2.isVisible()) {
-                            dlg2.dismiss();
-                        }
-                        if (status.getGamestatus() > 0) {
-                            Intent intentEndActivity = new Intent(context, EndActivity.class);
-                            intentEndActivity.putExtra("status", status.getGamestatus());
-                            startActivity(intentEndActivity);
-                        }
-
-                        // output distance
-                        outputDistance(status);
-
-                        Iterator it = markersContent.entrySet().iterator();
-                        while (it.hasNext()) {
-                            Map.Entry pair = (Map.Entry) it.next();
-                            ((Marker) pair.getKey()).remove();
-                            System.out.println(pair.getKey() + " = " + pair.getValue());
-                            it.remove(); // avoids a ConcurrentModificationException
-                        }
-                        mMap.clear();
-                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                        if (status.getMyposition().getTyp().equals(MemberTyp.HUNTER)) {
-                            setUpMap(status.getMyposition());
-                            builder.include(new LatLng(status.getMyposition().getLatitude(), status.getMyposition().getLongitude()));
-                        }
-                        setUpFox(status.getFoxposition());
-                        builder.include(new LatLng(status.getFoxposition().getLatitude(), status.getFoxposition().getLongitude()));
-                        for (MemberData positionData : status.getHuntersposition()) {
-                            setUpHunter(positionData);
-                            builder.include(new LatLng(positionData.getLatitude(), positionData.getLongitude()));
-                        }
-
-                        LatLngBounds bounds = builder.build();
-                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds,
-                                70);
-                        mMap.animateCamera(cu);
-                    }
-
-                } else {
-                    if (!(dlg1.isVisible())) {
-                        Log.e("abdeds dialog", "dialog is shown");
-                        dlg1.show(getFragmentManager(), "dlg1");
-                    }
-                }
+                    updateMap(status, context);
                 }
             }
         };
@@ -281,21 +232,27 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
      *
      * @param status - game data
      *
-     * @return distance between fox and hunter
+     * @return distance between fox and hunter. 0 when status is null
      */
-    public static float calculateDistance(GameStatus status) {
-        float[] results = new float[1];
+    private static float calculateDistance(GameStatus status) {
         float distance = 0.00f;
+
         if (status != null) {
+            Location from = new Location("From");
+            from.setLatitude(status.getMyposition().getLatitude());
+            from.setLongitude(status.getMyposition().getLongitude());
             if (status.getMyposition().getTyp().equals(MemberTyp.HUNTER)) {
-                Location.distanceBetween(status.getMyposition().getLatitude(), status.getMyposition().getLongitude(),
-                        status.getFoxposition().getLatitude(), status.getFoxposition().getLongitude(), results);
-                distance = results[0];
+                Location target = new Location("Target");
+                target.setLatitude(status.getFoxposition().getLatitude());
+                target.setLongitude(status.getFoxposition().getLongitude());
+                distance = from.distanceTo(target);
             } else {
                 for (MemberData positionData : status.getHuntersposition()) {
-                    Location.distanceBetween(status.getMyposition().getLatitude(), status.getMyposition().getLongitude(),
-                            positionData.getLatitude(), positionData.getLongitude(), results);
-                    distance = distance < results[0] ? results[0] : distance;
+                    Location target = new Location("Target");
+                    target.setLatitude(positionData.getLatitude());
+                    target.setLongitude(positionData.getLongitude());
+                    float result = from.distanceTo(target);
+                    distance = distance < result ? result : distance;
                 }
             }
         }
@@ -350,4 +307,59 @@ public class MapsActivity extends FragmentActivity  implements LocationListener 
 
      }
  }
+    /**
+     * Update the map after request acquire
+     * <p/>
+     * @param status - game status
+     * @param context - current context
+     */
+    private void updateMap(GameStatus status, Context context) {
+        if (status.getGamestatus() == 10) {
+            dlgAwaitForHunter.show(getFragmentManager(), "dlgAwaitForHunter");
+        }
+        if (status.getGamestatus() == 20) {
+            dlgAwaitForHunter.dismiss();
+            dlgAwaitForHunterDistance.show(getFragmentManager(), "dlg2");
+        }
+
+        if (status.getGamestatus() == 30) {
+            if (dlgAwaitForHunterDistance.isVisible()) {
+                dlgAwaitForHunterDistance.dismiss();
+            }
+        }
+        if (status.getGamestatus() > 30) {
+            Intent intentEndActivity = new Intent(context, EndActivity.class);
+            intentEndActivity.putExtra("status", status.getGamestatus());
+            startActivity(intentEndActivity);
+        }
+
+        // output distance
+        outputDistance(status);
+
+        Iterator it = markersContent.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            ((Marker) pair.getKey()).remove();
+            System.out.println(pair.getKey() + " = " + pair.getValue());
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+        mMap.clear();
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        if (status.getMyposition().getTyp().equals(MemberTyp.HUNTER)) {
+            setUpMap(status.getMyposition());
+            builder.include(new LatLng(status.getMyposition().getLatitude(), status.getMyposition().getLongitude()));
+        }
+        setUpFox(status.getFoxposition());
+        builder.include(new LatLng(status.getFoxposition().getLatitude(), status.getFoxposition().getLongitude()));
+        for (MemberData positionData : status.getHuntersposition()) {
+            setUpHunter(positionData);
+            builder.include(new LatLng(positionData.getLatitude(), positionData.getLongitude()));
+        }
+
+        LatLngBounds bounds = builder.build();
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds,
+                        70);
+        mMap.animateCamera(cu);
+
+    }
 }

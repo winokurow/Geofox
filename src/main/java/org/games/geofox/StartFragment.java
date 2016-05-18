@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 public class StartFragment extends DialogFragment {
 
-    final String LOG_TAG = "myLogs";
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         String text = this.getArguments().getString("text");
